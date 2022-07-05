@@ -1,4 +1,4 @@
-from entity import MateriaClass, ProfessorClass
+from v1.entity import MateriaClass, ProfessorClass
 import pandas as pd
 
 
@@ -21,7 +21,16 @@ class Dados:
             listProfessor.append(obj)
 
         listMateria = []
+        prof_materia = dict()
+        carga = dict()
+        rotulo_materia = []
+        rotulo_prof = []
         for idx, materia in enumerate(vet_materia_nome):
+            rotulo_materia.append(materia)
+            rotulo_prof.append(vet_materia_professor[idx])
+            prof_materia[materia] = 1
+            carga[materia] = vet_materia_carga[idx]
+
             obj = MateriaClass(materia, vet_materia_carga[idx], vet_materia_professor[idx])
             if vet_materia_professor[idx] is not None:
                 for i, prof in enumerate(listProfessor):
@@ -29,21 +38,13 @@ class Dados:
                         prof.adicionar_materia(obj)
             listMateria.append(obj)
 
-        rotulo_m = ["{}".format(valor.get_nome()) for idx, valor in enumerate(listMateria)]
+        # professores = dict()
+        # for i, prof in enumerate(listProfessor):
+        #     professores[prof.get_nome()] = []
+        #     listM = prof.get_materias()
+        #     for j, valor in enumerate(listM):
+        #         materia_carga = dict()
+        #         materia_carga[valor.get_nome()] = valor.get_carga_horaria()
+        #         professores[prof.get_nome()].append(materia_carga)
 
-        materias = dict()
-        for idx, valor in enumerate(rotulo_m):
-            materias[valor] = 1
-
-        carga_horaria = dict()
-        for idx, valor in enumerate(listMateria):
-            carga_horaria[valor.get_nome()] = valor.get_carga_horaria()
-
-        professores = dict()
-        for i, prof in enumerate(listProfessor):
-            professores[prof.get_nome()] = []
-            listM = prof.get_materias()
-            for j, valor in enumerate(listM):
-                professores[prof.get_nome()].append(valor.get_nome())
-
-        return materias, carga_horaria, professores, horarios
+        return prof_materia, horarios, carga, rotulo_materia, rotulo_prof

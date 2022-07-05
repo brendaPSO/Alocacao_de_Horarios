@@ -1,4 +1,4 @@
-from entity.materiaClass import MateriaClass
+from v1.entity.materiaClass import MateriaClass
 
 
 class ProfessorClass:
