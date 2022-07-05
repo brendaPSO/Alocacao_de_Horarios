@@ -15,9 +15,6 @@ class Dados:
         vet_materia_carga = list(dataMateria.values.base[2])
         horarios = ['18h', '19h', '20h', '21h', '22h']
         dia = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta']
-        dia_horario = dict()
-        for i in dia:
-            dia_horario[i] = horarios
 
         listProfessor = []
         for idx, professor in enumerate(vet_professores):
@@ -31,4 +28,4 @@ class Dados:
             carga[materia] = vet_materia_carga[idx]
             listMateria.append(materia)
 
-        return prof_materia, horarios, carga, listMateria, listProfessor, dia, dia_horario
+        return prof_materia, horarios, carga, listMateria, listProfessor, dia

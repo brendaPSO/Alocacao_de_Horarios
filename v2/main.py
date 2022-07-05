@@ -1,33 +1,37 @@
 from Database.organizarDados import Dados
 import gurobipy as gp
 
-[prof_materia, horarios, carga_materia, materia, professor, dia, dia_horario] = Dados.organizarDados()
+[prof_materia, horarios, carga_materia, materias, professores, dias] = Dados.organizarDados()
 
-m = gp.Model()
+model = gp.Model()
 
-"""Variáveis de Decisão"""
-x = m.addVars(professor, materia, horarios, dia, vtype=gp.GRB.BINARY)
+# ====== Variáveis de Decisão
+x = model.addVars(professores, materias, horarios, dias, vtype=gp.GRB.BINARY)
 
-"""Criação da Função Objetivo"""
-m.setObjective(x.sum('*', '*', '*', '*'), sense=gp.GRB.MINIMIZE)
 
-""" Criação das Restrições """
+# ====== Criação da Função Objetivo
+model.setObjective(gp.quicksum(x[p, m, h, d] for p in professores for m in materias for h in horarios for d in dias),
+                   sense=gp.GRB.MINIMIZE)
 
-"""Cada prof_matéria tem uma carga horária"""
-c1 = m.addConstrs(x.sum(prof_materia[j].strip(), j, '*', '*') == carga_materia[j] for j in materia)
 
-"Em uma determinada materia e horario, terá no máximo um professor"
-c2 = m.addConstrs(x.sum('*', j, k, '*') <= 1 for j in materia for k in horarios)
+# ====== Criação das Restrições
 
-"Em uma determinado professor e horario, terá no máximo uma matéria"
-c2 = m.addConstrs(x.sum(i, '*', k, d) <= 1 for i in professor for k in horarios for d in dia)
+"""Cada matéria do professor tem uma carga horária"""
+c1 = model.addConstrs(x.sum(prof_materia[m].strip(), m, '*', '*') == carga_materia[m] for m in materias)
 
-"""Executa o modelo"""
-m.optimize()
+"Em uma determinada materia, horario e dia, terá no máximo um professor"
+c2 = model.addConstrs(x.sum('*', m, h, '*') <= 1 for m in materias for h in horarios)
 
-for i in professor:
-    for j in materia:
-        for k in horarios:
-            for d in dia:
-                if round(x[i, j, k, d].X) == 1:
-                    print(i, j, k, d)
+"Em um determinado professor, horario e dia, terá no máximo uma matéria"
+c3 = model.addConstrs(x.sum(p, '*', h, d) <= 1 for p in professores for h in horarios for d in dias)
+
+
+# ====== Executa o modelo
+model.optimize()
+
+for p in professores:
+    for m in materias:
+        for h in horarios:
+            for d in dias:
+                if round(x[p, m, h, d].X) == 1:
+                    print(p, m, h, d)
